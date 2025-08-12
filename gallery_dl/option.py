@@ -286,6 +286,11 @@ def build_parser():
         help="Delete cached login sessions, cookies, etc. for MODULE "
              "(ALL to delete everything)",
     )
+    general.add_argument(
+        "--compat",
+        dest="category-map", nargs=0, action=ConfigConstAction, const="compat",
+        help="Restore legacy 'category' names",
+    )
 
     update = parser.add_argument_group("Update Options")
     if util.EXECUTABLE:
@@ -534,6 +539,12 @@ def build_parser():
               "during data extraction"),
     )
     downloader.add_argument(
+        "--sleep-429",
+        dest="sleep-429", metavar="SECONDS", action=ConfigAction,
+        help=("Number of seconds to wait when receiving a "
+              "'429 Too Many Requests' response"),
+    )
+    downloader.add_argument(
         "--sleep-extractor",
         dest="sleep-extractor", metavar="SECONDS", action=ConfigAction,
         help=("Number of seconds to wait before starting data extraction "
@@ -653,14 +664,18 @@ def build_parser():
     selection = parser.add_argument_group("Selection Options")
     selection.add_argument(
         "-A", "--abort",
-        dest="abort", metavar="N", type=int,
-        help=("Stop current extractor run "
-              "after N consecutive file downloads were skipped"),
+        dest="abort", metavar="N[:TARGET]",
+        help=("Stop current extractor(s) "
+              "after N consecutive file downloads were skipped. "
+              "Specify a TARGET to set how many levels to ascend or "
+              "to which subcategory to jump to. "
+              "Examples: '-A 3', '-A 3:2', '-A 3:manga'"),
     )
     selection.add_argument(
         "-T", "--terminate",
-        dest="terminate", metavar="N", type=int,
-        help=("Stop current and parent extractor runs "
+        dest="terminate", metavar="N",
+        help=("Stop current & parent extractors "
+              "and proceed with the next input URL "
               "after N consecutive file downloads were skipped"),
     )
     selection.add_argument(

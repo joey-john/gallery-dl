@@ -158,6 +158,12 @@ Consider all listed sites to potentially be NSFW.
     <td><a href="https://github.com/mikf/gallery-dl#cookies">Cookies</a></td>
 </tr>
 <tr>
+    <td>BOOTH</td>
+    <td>https://booth.pm/</td>
+    <td>Items, Shops</td>
+    <td></td>
+</tr>
+<tr>
     <td>Bunkr</td>
     <td>https://bunkr.si/</td>
     <td>Albums, Media Files</td>
@@ -184,7 +190,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Civitai</td>
     <td>https://www.civitai.com/</td>
-    <td>individual Images, Image Listings, Models, Model Listings, Posts, Post Listings, Image Searches, Model Searches, Tag Searches, User Profiles, User Images, Image Reactions, User Models, User Posts, User Videos, Video Reactions</td>
+    <td>Collections, Generated Files, individual Images, Image Listings, Models, Model Listings, Posts, Post Listings, Image Searches, Model Searches, Tag Searches, User Profiles, User Collections, User Images, Image Reactions, User Models, User Posts, User Videos, Video Reactions</td>
     <td></td>
 </tr>
 <tr>
@@ -201,7 +207,7 @@ Consider all listed sites to potentially be NSFW.
 </tr>
 <tr>
     <td>Coomer</td>
-    <td>https://coomer.su/</td>
+    <td>https://coomer.st/</td>
     <td>Artists, Favorites, Posts, User Profiles</td>
     <td>Supported</td>
 </tr>
@@ -274,7 +280,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Facebook</td>
     <td>https://www.facebook.com/</td>
-    <td>Photos, Profiles, Sets, Videos</td>
+    <td>Albums, Avatars, User Profile Information, Photos, Profile Photos, Sets, User Profiles, Videos</td>
     <td><a href="https://github.com/mikf/gallery-dl#cookies">Cookies</a></td>
 </tr>
 <tr>
@@ -411,7 +417,7 @@ Consider all listed sites to potentially be NSFW.
 </tr>
 <tr>
     <td>Idol Complex</td>
-    <td>https://idol.sankakucomplex.com/</td>
+    <td>https://www.idolcomplex.com/</td>
     <td>Pools, Posts, Tag Searches</td>
     <td>Supported</td>
 </tr>
@@ -446,6 +452,12 @@ Consider all listed sites to potentially be NSFW.
     <td></td>
 </tr>
 <tr>
+    <td>ImgAdult</td>
+    <td>https://imgadult.com/</td>
+    <td>individual Images</td>
+    <td></td>
+</tr>
+<tr>
     <td>ImgBB</td>
     <td>https://imgbb.com/</td>
     <td>Albums, individual Images, User Profiles</td>
@@ -460,6 +472,12 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Imgclick</td>
     <td>http://imgclick.net/</td>
+    <td>individual Images</td>
+    <td></td>
+</tr>
+<tr>
+    <td>ImgDrive.net</td>
+    <td>https://imgdrive.net/</td>
     <td>individual Images</td>
     <td></td>
 </tr>
@@ -508,7 +526,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Itaku</td>
     <td>https://itaku.ee/</td>
-    <td>Galleries, individual Images, Search Results, Stars</td>
+    <td>Bookmarks, Followers, Followed Users, Galleries, individual Images, Posts, Search Results, Stars, User Profiles</td>
     <td></td>
 </tr>
 <tr>
@@ -518,6 +536,12 @@ Consider all listed sites to potentially be NSFW.
     <td></td>
 </tr>
 <tr>
+    <td>Iwara</td>
+    <td>https://www.iwara.tv/</td>
+    <td>Favorites, Followers, Followed Users, individual Images, Playlists, Search Results, Tag Searches, User Profiles, User Images, User Playlists, User Videos, Videos</td>
+    <td>Supported</td>
+</tr>
+<tr>
     <td>Keenspot</td>
     <td>http://www.keenspot.com/</td>
     <td>Comics</td>
@@ -525,7 +549,7 @@ Consider all listed sites to potentially be NSFW.
 </tr>
 <tr>
     <td>Kemono</td>
-    <td>https://kemono.su/</td>
+    <td>https://kemono.cr/</td>
     <td>Artists, Discord Servers, Favorites, Posts, User Profiles</td>
     <td>Supported</td>
 </tr>
@@ -537,8 +561,14 @@ Consider all listed sites to potentially be NSFW.
 </tr>
 <tr>
     <td>Komikcast</td>
-    <td>https://komikcast02.com/</td>
+    <td>https://komikcast.li/</td>
     <td>Chapters, Manga</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Leak Gallery</td>
+    <td>https://leakgallery.com</td>
+    <td>Most Liked Posts, Posts, Trending Medias, User Profiles</td>
     <td></td>
 </tr>
 <tr>
@@ -576,6 +606,12 @@ Consider all listed sites to potentially be NSFW.
     <td>https://members.luscious.net/</td>
     <td>Albums, Search Results</td>
     <td></td>
+</tr>
+<tr>
+    <td>Madokami</td>
+    <td>https://manga.madokami.al/</td>
+    <td>Manga</td>
+    <td>Required</td>
 </tr>
 <tr>
     <td>Manga Fox</td>
@@ -616,7 +652,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Motherless</td>
     <td>https://motherless.com/</td>
-    <td>Galleries, Media Files</td>
+    <td>Galleries, Groups, Media Files</td>
     <td></td>
 </tr>
 <tr>
@@ -701,6 +737,12 @@ Consider all listed sites to potentially be NSFW.
     <td>Picarto</td>
     <td>https://picarto.tv/</td>
     <td>Galleries</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Picstate</td>
+    <td>https://picstate.com/</td>
+    <td>individual Images</td>
     <td></td>
 </tr>
 <tr>
@@ -910,7 +952,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Skeb</td>
     <td>https://skeb.jp/</td>
-    <td>Followed Creators, Followed Users, Posts, Search Results, User Profiles</td>
+    <td>Followed Creators, Followed Users, Posts, Search Results, Sent Requests, User Profiles, Works</td>
     <td></td>
 </tr>
 <tr>
@@ -1010,7 +1052,7 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Tumblr</td>
     <td>https://www.tumblr.com/</td>
-    <td>Days, Likes, Posts, Search Results, Tag Searches, User Profiles</td>
+    <td>Days, Followers, Followed Users, Likes, Posts, Search Results, Tag Searches, User Profiles</td>
     <td><a href="https://github.com/mikf/gallery-dl#oauth">OAuth</a></td>
 </tr>
 <tr>
@@ -1143,6 +1185,12 @@ Consider all listed sites to potentially be NSFW.
     <td>Wikifeetx</td>
     <td>https://www.wikifeetx.com/</td>
     <td>Galleries</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Xasiat</td>
+    <td>https://www.xasiat.com</td>
+    <td>Albums, Categories, Models, Tag Searches</td>
     <td></td>
 </tr>
 <tr>
@@ -1478,6 +1526,12 @@ Consider all listed sites to potentially be NSFW.
 <tr>
     <td>Misskey.design</td>
     <td>https://misskey.design/</td>
+    <td>Avatars, Backgrounds, Favorites, Followed Users, User Profile Information, Notes, User Notes, User Profiles</td>
+    <td></td>
+</tr>
+<tr>
+    <td>Misskey.art</td>
+    <td>https://misskey.art/</td>
     <td>Avatars, Backgrounds, Favorites, Followed Users, User Profile Information, Notes, User Notes, User Profiles</td>
     <td></td>
 </tr>

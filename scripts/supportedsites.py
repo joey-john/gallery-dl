@@ -37,6 +37,7 @@ CATEGORY_MAP = {
     "baraag"         : "baraag",
     "batoto"         : "BATO.TO",
     "bbc"            : "BBC",
+    "booth"          : "BOOTH",
     "cien"           : "Ci-en",
     "cohost"         : "cohost!",
     "comicvine"      : "Comic Vine",
@@ -79,9 +80,11 @@ CATEGORY_MAP = {
     "imagebam"       : "ImageBam",
     "imagefap"       : "ImageFap",
     "imagepond"      : "ImagePond",
+    "imgadult"       : "ImgAdult",
     "imgbb"          : "ImgBB",
     "imgbox"         : "imgbox",
     "imagechest"     : "ImageChest",
+    "imgdrive"       : "ImgDrive.net",
     "imgkiwi"        : "IMG.Kiwi",
     "imgth"          : "imgth",
     "imgur"          : "imgur",
@@ -91,6 +94,7 @@ CATEGORY_MAP = {
     "jpgfish"        : "JPG Fish",
     "kabeuchi"       : "かべうち",
     "schalenetwork"  : "Schale Network",
+    "leakgallery"    : "Leak Gallery",
     "livedoor"       : "livedoor Blog",
     "lofter"         : "LOFTER",
     "ohpolly"        : "Oh Polly",
@@ -236,6 +240,8 @@ SUBCATEGORY_MAP = {
         "user-images": ("User Images", "Image Reactions"),
         "user-posts" : "User Posts",
         "user-videos": ("User Videos", "Video Reactions"),
+        "user-collections" : "User Collections",
+        "generated": "Generated Files",
     },
     "coomer": {
         "discord"       : "",
@@ -257,6 +263,9 @@ SUBCATEGORY_MAP = {
     },
     "discord": {
         "direct-message" : "",
+    },
+    "facebook": {
+        "photos" : "Profile Photos",
     },
     "fanbox": {
         "supporting": "Supported User Feed",
@@ -287,10 +296,22 @@ SUBCATEGORY_MAP = {
         "saved": "Saved Posts",
         "tagged": "Tagged Posts",
     },
+    "itaku": {
+        "posts": "",
+    },
+    "iwara": {
+        "user-images": "User Images",
+        "user-videos": "User Videos",
+        "user-playlists": "User Playlists",
+    },
     "kemono": {
         "discord"       : "Discord Servers",
         "discord-server": "",
         "posts"         : "",
+    },
+    "leakgallery": {
+        "trending" : "Trending Medias",
+        "mostliked": "Most Liked Posts",
     },
     "lensdump": {
         "albums": "",
@@ -359,6 +380,7 @@ SUBCATEGORY_MAP = {
     "skeb": {
         "following"      : "Followed Creators",
         "following-users": "Followed Users",
+        "sent-requests"  : "Sent Requests",
     },
     "smugmug": {
         "path": "Images from Users and Folders",
@@ -475,7 +497,9 @@ AUTH_MAP = {
     "imgbb"          : "Supported",
     "inkbunny"       : "Supported",
     "instagram"      : _COOKIES,
+    "iwara"          : "Supported",
     "kemono"         : "Supported",
+    "madokami"       : "Required",
     "mangadex"       : "Supported",
     "mangoxo"        : "Supported",
     "mastodon.social": _OAUTH,
@@ -618,9 +642,9 @@ def build_extractor_list():
     default["e-hentai"] = default["exhentai"]
     domains["e-hentai"] = domains["exhentai"].replace("x", "-")
 
-    # add coomer.su
+    # add coomer.st
     default["coomer"] = default["kemono"]
-    domains["coomer"] = domains["kemono"].replace("kemono", "coomer")
+    domains["coomer"] = "https://coomer.st/"
 
     # add wikifeetx.com
     default["wikifeetx"] = default["wikifeet"]

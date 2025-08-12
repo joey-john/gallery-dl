@@ -32,10 +32,13 @@ class WikimediaExtractor(BaseExtractor):
                 f"{self.root.partition('.')[0].rpartition('/')[2]}")
 
         self.per_page = self.config("limit", 50)
+        self.subcategories = False
+
+        if useragent := self.config_instance("useragent"):
+            self.useragent = useragent
 
     def _init(self):
-        api_path = self.config_instance("api-path")
-        if api_path:
+        if api_path := self.config_instance("api-path"):
             if api_path[0] == "/":
                 self.api_url = self.root + api_path
             else:
@@ -110,14 +113,12 @@ class WikimediaExtractor(BaseExtractor):
             data = self.request_json(url, params=params)
 
             # ref: https://www.mediawiki.org/wiki/API:Errors_and_warnings
-            error = data.get("error")
-            if error:
+            if error := data.get("error"):
                 self.log.error("%s: %s", error["code"], error["info"])
                 return
             # MediaWiki will emit warnings for non-fatal mistakes such as
             # invalid parameter instead of raising an error
-            warnings = data.get("warnings")
-            if warnings:
+            if warnings := data.get("warnings"):
                 self.log.debug("MediaWiki returned warnings: %s", warnings)
 
             try:
@@ -187,6 +188,7 @@ BASE_PATTERN = WikimediaExtractor.update({
         "root": "https://azurlane.koumakan.jp",
         "pattern": r"azurlane\.koumakan\.jp",
         "api-path": "/w/api.php",
+        "useragent": "Googlebot-Image/1.0",
     },
 })
 
@@ -216,8 +218,8 @@ class WikimediaArticleExtractor(WikimediaExtractor):
             self.subcategory = prefix
 
         if prefix == "category":
-            self.subcategories = \
-                True if self.config("subcategories", True) else False
+            if self.config("subcategories", True):
+                self.subcategories = True
             self.params = {
                 "generator": "categorymembers",
                 "gcmtitle" : path,
@@ -225,12 +227,10 @@ class WikimediaArticleExtractor(WikimediaExtractor):
                 "gcmlimit" : self.per_page,
             }
         elif prefix == "file":
-            self.subcategories = False
             self.params = {
                 "titles"   : path,
             }
         else:
-            self.subcategories = False
             self.params = {
                 "generator": "images",
                 "gimlimit" : self.per_page,
@@ -238,7 +238,7 @@ class WikimediaArticleExtractor(WikimediaExtractor):
             }
 
     def prepare(self, image):
-        WikimediaExtractor.prepare(image)
+        WikimediaExtractor.prepare(self, image)
         image["page"] = self.title
 
 

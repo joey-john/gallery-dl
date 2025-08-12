@@ -313,28 +313,51 @@ Type
     * ``string``
 Default
     ``true``
+Example
+    * ``"abort:5"``
+    * ``"abort:5:2"``
+    * ``"abort:5:manga"``
+    * ``"terminate:3"``
 Description
     Controls the behavior when downloading files that have been
     downloaded before, i.e. a file with the same filename already
     exists or its ID is in a `download archive <extractor.*.archive_>`__.
 
-    * ``true``: Skip downloads
-    * ``false``: Overwrite already existing files
+    ``true``
+        Skip downloads
+    ``false``
+        Overwrite already existing files
 
-    * ``"abort"``: Stop the current extractor run
-    * ``"abort:N"``: Skip downloads and stop the current extractor run
-      after ``N`` consecutive skips
+    ``"abort"``
+        Stop the current extractor
+    ``"abort:N"``
+        Skip downloads and
+        stop the current extractor after ``N`` consecutive skips
+    ``"abort:N:L"``
+        | Skip downloads and
+          stop the current extractor after ``N`` consecutive skips
+        | Ascend ``L`` levels in the extractor hierarchy
+    ``"abort:N:SC"``
+        | Skip downloads and
+          stop the current extractor after ``N`` consecutive skips
+        | Ascend to an extractor with subcategory ``SC`` in the extractor hierarchy
 
-    * ``"terminate"``: Stop the current extractor run, including parent extractors
-    * ``"terminate:N"``: Skip downloads and stop the current extractor run,
-      including parent extractors, after ``N`` consecutive skips
+    ``"terminate"``
+        Stop the current extractor, including parent extractors
+    ``"terminate:N"``
+        Skip downloads and
+        stop the current extractor, including parent extractors,
+        after ``N`` consecutive skips
 
-    * ``"exit"``: Exit the program altogether
-    * ``"exit:N"``: Skip downloads and exit the program
-      after ``N`` consecutive skips
+    ``"exit"``
+        Exit the program altogether
+    ``"exit:N"``
+        Skip downloads and
+        exit the program after ``N`` consecutive skips
 
-    * ``"enumerate"``: Add an enumeration index to the beginning of the
-      filename extension (``file.1.ext``, ``file.2.ext``, etc.)
+    ``"enumerate"``
+        Add an enumeration index to the beginning of the
+        filename extension (``file.1.ext``, ``file.2.ext``, etc.)
 
 
 extractor.*.skip-filter
@@ -386,6 +409,7 @@ Default
     * ``"0.5-1.5"``
         ``ao3``,
         ``arcalive``,
+        ``booth``,
         ``civitai``,
         ``[Danbooru]``,
         ``[E621]``,
@@ -422,7 +446,6 @@ Default
     * ``"3.0-6.0"``
         ``bilibili``,
         ``exhentai``,
-        ``idolcomplex``,
         ``[reactor]``,
         ``readcomiconline``
     * ``"6.0-6.1"``
@@ -466,7 +489,9 @@ Description
     * ``idolcomplex``
     * ``imgbb``
     * ``inkbunny``
+    * ``iwara``
     * ``kemono``
+    * ``madokami`` (R)
     * ``mangadex``
     * ``mangoxo``
     * ``newgrounds``
@@ -670,11 +695,18 @@ Default
     * ``"Patreon/72.2.28 (Android; Android 14; Scale/2.10)"``: ``patreon``
     * ``"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/LATEST.0.0.0 Safari/537.36"``: ``instagram``
     * ``"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:LATEST) Gecko/20100101 Firefox/LATEST"``: otherwise
+Example
+    * ``"curl/8.14.1"``
+    * ``"browser"``
+    * ``"@chrome"``
 Description
     User-Agent header value used for HTTP requests.
 
     Setting this value to ``"browser"`` will try to automatically detect
     and use the ``User-Agent`` header of the system's default browser.
+
+    Setting this value to ``"@BROWSER"``, e.g. ``"@chrome"``, will try to automatically detect
+    and use the ``User-Agent`` header of this installed browser.
 
 
 extractor.*.browser
@@ -682,7 +714,7 @@ extractor.*.browser
 Type
     ``string``
 Default
-    * ``"firefox"``: ``artstation``, ``fanbox``, ``twitter``
+    * ``"firefox"``: ``artstation``, ``behance``, ``fanbox``, ``twitter``
     * ``null``: otherwise
 Example
     * ``"firefox/128:linux"``
@@ -784,7 +816,7 @@ extractor.*.tls12
 Type
     ``bool``
 Default
-    * ``false``: ``artstation``, ``behance``
+    * ``false``: ``artstation``, ``behance``, ``vsco``
     * ``true``: otherwise
 Description
     Allow selecting TLS 1.2 cipher suites.
@@ -1056,8 +1088,8 @@ Description
 extractor.*.actions
 -------------------
 Type
-    * ``object`` (`pattern` -> `action(s)`)
-    * ``list`` of ``lists`` with `pattern` -> `action(s)` pairs as elements
+    * ``object`` (`pattern` -> `Action(s)`_)
+    * ``list`` of ``lists`` with `pattern` -> `Action(s)`_ pairs as elements
 Example
     .. code:: json
 
@@ -1084,50 +1116,16 @@ Example
         ]
 
 Description
-    Perform an ``action`` when logging a message matched by ``pattern``.
+    Perform an Action_ when logging a message matched by ``pattern``.
 
     ``pattern`` is parsed as severity level (``debug``, ``info``, ``warning``, ``error``, or integer value)
-    followed by an optional `Python Regular Expression <https://docs.python.org/3/library/re.html#regular-expression-syntax>`__
-    separated by a colon ``:``.
+    followed by an optional
+    `Python Regular Expression <https://docs.python.org/3/library/re.html#regular-expression-syntax>`__
+    separated by a colon ``:``
+
     Using ``*`` as `level` or leaving it empty
     matches logging messages of all levels
     (e.g. ``*:<re>`` or ``:<re>``).
-
-    ``action`` is parsed as action type
-    followed by (optional) arguments.
-
-    It is possible to specify more than one ``action`` per ``pattern``
-    by providing them as a ``list``: ``["<action1>", "<action2>", …]``
-
-    Supported Action Types:
-
-    ``status``:
-        | Modify job exit status.
-        | Expected syntax is ``<operator> <value>`` (e.g. ``= 100``).
-
-        Supported operators are
-        ``=`` (assignment),
-        ``&`` (bitwise AND),
-        ``|`` (bitwise OR),
-        ``^`` (bitwise XOR).
-    ``level``:
-        | Modify severity level of the current logging message.
-        | Can be one of ``debug``, ``info``, ``warning``, ``error`` or an integer value.
-    ``print``:
-        Write argument to stdout.
-    ``exec``:
-        Run a shell command.
-    ``abort``:
-        Stop the current extractor run.
-    ``terminate``:
-        Stop the current extractor run, including parent extractors.
-    ``restart``:
-        Restart the current extractor run.
-    ``wait``:
-        | Sleep for a given Duration_ or
-        | wait until Enter is pressed when no argument was given.
-    ``exit``:
-        Exit the program with the given argument as exit status.
 
 
 extractor.*.postprocessors
@@ -1480,6 +1478,16 @@ Description
     Limit the number of posts/projects to download.
 
 
+extractor.artstation.mviews
+---------------------------
+Type
+    ``bool``
+Default
+    ``true``
+Description
+    Download ``.mview`` files.
+
+
 extractor.artstation.previews
 -----------------------------
 Type
@@ -1487,7 +1495,7 @@ Type
 Default
     ``false``
 Description
-    Download video previews.
+    Download embed previews.
 
 
 extractor.artstation.videos
@@ -1765,6 +1773,23 @@ Description
     * ``tiny`` (144p)
 
 
+extractor.booth.strategy
+------------------------
+Type
+    ``string``
+Default
+    ``"webpage"``
+Description
+    Selects how to handle and extract file URLs.
+
+    ``"webpage"``
+        Retrieve the full HTML page
+        and extract file URLs from it
+    ``"fallback"``
+        Use `fallback <extractor.*.fallback_>`__ URLs
+        to `guess` each file's correct filename extension
+
+
 extractor.bunkr.endpoint
 ------------------------
 Type
@@ -1851,7 +1876,7 @@ Type
     * ``string``
     * ``list`` of ``strings``
 Default
-    ``["user-models", "user-posts"]``
+    ``["user-images", "user-videos"]``
 Description
     A (comma-separated) list of subcategories to include
     when processing a user profile.
@@ -1862,8 +1887,16 @@ Description
     * ``"user-posts"``
     * ``"user-images"``
     * ``"user-videos"``
+    * ``"user-collections"``
 
     It is possible to use ``"all"`` instead of listing all values separately.
+Note
+    To get a more complete set of metadata
+    like ``model['name']`` and ``post['title']``,
+    include ``user-models`` and ``user-posts``
+    as well as the default ``user-images`` and ``user-videos``:
+
+    ``["user-models", "user-posts", "user-images", "user-videos"]``
 
 
 extractor.civitai.metadata
@@ -1945,6 +1978,20 @@ Description
 
     Use ``+`` as first character to `add` the given options to the
     `quality <extractor.civitai.quality_>`__ ones.
+
+
+extractor.comick.lang
+---------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Example
+    * ``"en"``
+    * ``"fr,it,pl"``
+    * ``["fr", "it", "pl"]``
+Description
+    `ISO 639-1 <https://en.wikipedia.org/wiki/ISO_639-1>`__ language codes
+    to filter chapters by.
 
 
 extractor.cyberdrop.domain
@@ -2615,6 +2662,30 @@ description
     Extract comments that include photo attachments made by the author of the post.
 
 
+extractor.facebook.include
+--------------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``"photos"``
+Example
+    * ``"avatar,photos"``
+    * ``["avatar", "photos"]``
+Description
+    A (comma-separated) list of subcategories to include
+    when processing a user profile.
+
+    Supported values are
+
+    * ``info``
+    * ``avatar``
+    * ``photos``
+    * ``albums``
+
+    It is possible to use ``"all"`` instead of listing all values separately.
+
+
 extractor.facebook.videos
 -------------------------
 Type
@@ -2938,6 +3009,19 @@ Description
     Recursively download files from subfolders.
 
 
+extractor.hentaifoundry.descriptions
+------------------------------------
+Type
+    ``string``
+Default
+    ``"text"``
+Description
+    Controls the format of ``description`` metadata fields.
+
+    * ``"text"``: Plain text with HTML tags removed
+    * ``"html"``: Raw HTML content
+
+
 extractor.hentaifoundry.include
 -------------------------------
 Type
@@ -3047,10 +3131,13 @@ Example
 Description
     Controls from which position to start the extraction process from.
 
-    * ``true``: Start from the beginning.
-      Log the most recent ``cursor`` value when interrupted before reaching the end.
-    * ``false``: Start from the beginning.
-    * any ``string``: Start from the position defined by this value.
+    ``true``
+        | Start from the beginning.
+        | Log the most recent ``cursor`` value when interrupted before reaching the end.
+    ``false``
+        Start from the beginning.
+    any ``string``
+        Start from the position defined by this value.
 
 
 extractor.instagram.include
@@ -3176,6 +3263,31 @@ Description
     Split ``stories`` elements into separate posts.
 
 
+extractor.itaku.include
+-----------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``"gallery"``
+Example
+    * ``"stars,gallery"``
+    * ``["stars", "gallery"]``
+Description
+    A (comma-separated) list of subcategories to include
+    when processing a user profile.
+
+    Supported values are
+
+    * ``gallery``
+    * ``posts``
+    * ``followers``
+    * ``following``
+    * ``stars``
+
+    It is possible to use ``"all"`` instead of listing all values separately.
+
+
 extractor.itaku.videos
 ----------------------
 Type
@@ -3184,6 +3296,26 @@ Default
     ``true``
 Description
     Download video files.
+
+
+extractor.iwara.include
+-----------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``["user-images", "user-videos"]``
+Description
+    A (comma-separated) list of subcategories to include
+    when processing a user profile.
+
+    Possible values are
+
+    * ``"user-images"``
+    * ``"user-videos"``
+    * ``"user-playlists"``
+
+    It is possible to use ``"all"`` instead of listing all values separately.
 
 
 extractor.kemono.archives
@@ -3824,6 +3956,27 @@ Description
     Note: This requires 1 additional HTTP request per post.
 
 
+extractor.patreon.cursor
+------------------------
+Type
+    * ``bool``
+    * ``string``
+Default
+    ``true``
+Example
+    ``"03:eyJ2IjoxLCJjIjoiMzU0NDQ1MjAiLCJ0IjoiIn0=:DTcmjBoVj01o_492YBYqHhqx"``
+Description
+    Controls from which position to start the extraction process from.
+
+    ``true``
+        | Start from the beginning.
+        | Log the most recent ``cursor`` value when interrupted before reaching the end.
+    ``false``
+        Start from the beginning.
+    any ``string``
+        Start from the position defined by this value.
+
+
 extractor.patreon.files
 -----------------------
 Type
@@ -3863,6 +4016,16 @@ Description
     * ``thumbnail`` (``"h":360,"w":360``)
     * ``thumbnail_large`` (``"h":1080,"w":1080``)
     * ``thumbnail_small`` (``"h":100,"w":100``)
+
+
+extractor.patreon.user.date-max
+-------------------------------
+Type
+    |Date|_
+Default
+    ``0``
+Description
+    Sets the |Date|_ to start from.
 
 
 extractor.[philomena].api-key
@@ -4583,6 +4746,28 @@ Description
     Download article images.
 
 
+extractor.skeb.include
+----------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``"works"``
+Example
+    * ``"works,sent-requests"``
+    * ``["works", "sent-requests"]``
+Description
+    A (comma-separated) list of subcategories to include
+    when processing a user profile.
+
+    Possible values are
+
+    * ``"works"``
+    * ``"sent-requests"``
+
+    It is possible to use ``"all"`` instead of listing all values separately.
+
+
 extractor.skeb.sent-requests
 ----------------------------
 Type
@@ -4875,11 +5060,11 @@ Description
 extractor.tiktok.user.module
 ----------------------------
 Type
-    ``string``
+    |Module|_
 Default
     ``null``
 Description
-    Name or filesystem path of the ``ytdl`` Python module
+    The |ytdl| |Module|_
     to extract posts from a ``tiktok`` user profile with.
 
     See `extractor.ytdl.module`_.
@@ -5178,12 +5363,15 @@ Example
 Description
     Controls from which position to start the extraction process from.
 
-    * ``true``: Start from the beginning.
-      Log the most recent ``cursor`` value when interrupted before reaching the end.
-    * ``false``: Start from the beginning.
-    * any ``string``: Start from the position defined by this value.
-
-    Note: A ``cursor`` value from one timeline cannot be used with another.
+    ``true``
+        | Start from the beginning.
+        | Log the most recent ``cursor`` value when interrupted before reaching the end.
+    ``false``
+        Start from the beginning.
+    any ``string``
+        Start from the position defined by this value.
+Note
+    A ``cursor`` value from one timeline cannot be used with another.
 
 
 extractor.twitter.expand
@@ -5826,6 +6014,16 @@ Description
     Location of a |ytdl| configuration file to load options from.
 
 
+extractor.ytdl.deprecations
+---------------------------
+Type
+    ´´bool´´
+Default
+    ``false``
+Description
+    Allow |ytdl| to warn about deprecated options and features.
+
+
 extractor.ytdl.enabled
 ----------------------
 Type
@@ -5896,15 +6094,14 @@ Description
 extractor.ytdl.module
 ---------------------
 Type
-    * ``string``
-    * |Path|_
+    |Module|_
 Default
     ``null``
 Example
     * ``"yt-dlp"``
     * ``"/home/user/.local/lib/python3.13/site-packages/youtube_dl"``
 Description
-    Name or filesystem path of the ``ytdl`` Python module to import.
+    The ``ytdl`` |Module|_ to import.
 
     Setting this to ``null`` will try to import ``"yt_dlp"``
     followed by ``"youtube_dl"`` as fallback.
@@ -5922,7 +6119,6 @@ Example
             "writesubtitles": true,
             "merge_output_format": "mkv"
         }
-
 Description
     Additional options passed directly to the ``YoutubeDL`` constructor.
 
@@ -6353,6 +6549,16 @@ Description
     Location of a |ytdl| configuration file to load options from.
 
 
+downloader.ytdl.deprecations
+----------------------------
+Type
+    ´´bool´´
+Default
+    ``false``
+Description
+    Allow |ytdl| to warn about deprecated options and features.
+
+
 downloader.ytdl.format
 ----------------------
 Type
@@ -6397,15 +6603,14 @@ Description
 downloader.ytdl.module
 ----------------------
 Type
-    * ``string``
-    * |Path|_
+    |Module|_
 Default
     ``null``
 Example
     * ``"yt-dlp"``
     * ``"/home/user/.local/lib/python3.13/site-packages/youtube_dl"``
 Description
-    Name or filesystem path of the ``ytdl`` Python module to import.
+    The ``ytdl`` |Module|_ to import.
 
     Setting this to ``null`` will try to import ``"yt_dlp"``
     followed by ``"youtube_dl"`` as fallback.
@@ -6919,6 +7124,26 @@ Description
     The event(s) for which `exec.command`_ is run.
 
     See `metadata.event`_ for a list of available events.
+
+
+exec.session
+------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Start subprocesses in a new session.
+
+    On Windows, this means passing
+    `CREATE_NEW_PROCESS_GROUP <https://docs.python.org/3/library/subprocess.html#subprocess.CREATE_NEW_PROCESS_GROUP>`__
+    as a ``creationflags`` argument to
+    `subprocess.Popen <https://docs.python.org/3/library/subprocess.html#subprocess.Popen>`__
+
+    On POSIX systems, this means enabling the
+    ``start_new_session`` argument of
+    `subprocess.Popen <https://docs.python.org/3/library/subprocess.html#subprocess.Popen>`__
+    to have it call ``setsid()``.
 
 
 hash.chunk-size
@@ -7437,15 +7662,15 @@ Type
     ``string``
 Example
     * ``"my_module:generate_text"``
-    * ``"~/.local/share/gdl-utils.py:resize"``
+    * ``"~/.local/share/gdl_utils.py:resize"``
 Description
     The Python function to call.
 
-    This function is specified as ``<module>:<function name>``
-    and gets called with the current metadata dict as argument.
+    | This function is specified as ``<module>:<function name>``, where
+    | ``<module>`` is a |Module|_ and
+      ``<function name>`` is the name of the function in that module.
 
-    ``module`` is either an importable Python module name
-    or the |Path|_ to a `.py` file,
+    It gets called with the current metadata dict as argument.
 
 
 rename.from
@@ -7816,23 +8041,71 @@ Description
     Duplicate the configuration settings of extractor `categories`
     to other names.
 
+    For example, a ``"naver": "naver-blog"`` key-value pair will make all
+    ``naver`` config settings available for ´´naver-blog´´ extractors as well.
+
+
+jinja.environment
+-----------------
+Type
+    ``object`` (`name` -> `value`)
+Example
+    .. code:: json
+
+        {
+            "variable_start_string": "(((",
+            "variable_end_string"  : ")))",
+            "keep_trailing_newline": true
+        }
+Description
+    Initialization parameters for the |jinja|
+    `Environment <https://jinja.palletsprojects.com/en/stable/api/#jinja2.Environment>`__
+    object.
+
+
+jinja.policies
+--------------
+Type
+    ``object`` (`name` -> `value`)
+Example
+    .. code:: json
+
+        {
+            "urlize.rel": "nofollow noopener",
+            "ext.i18n.trimmed": true
+        }
+Description
+    |jinja|
+    `Policies <https://jinja.palletsprojects.com/en/stable/api/#policies>`__
+
+
+jinja.filters
+-------------
+Type
+    |Module|_
+Description
+    A Python |Module|_ containing custom |jinja|
+    `filters <https://jinja.palletsprojects.com/en/stable/api/#custom-filters>`__
+
+
+jinja.tests
+-----------
+Type
+    |Module|_
+Description
+    A Python |Module|_ containing custom |jinja|
+    `tests <https://jinja.palletsprojects.com/en/stable/api/#custom-tests>`__
+
 
 globals
 -------
 Type
-    * |Path|_
-    * ``string``
-Example
-    * ``"~/.local/share/gdl-globals.py"``
-    * ``"gdl-globals"``
+    |Module|_
 Description
-    | Path to or name of an
-      `importable <https://docs.python.org/3/reference/import.html>`__
-      Python module,
-    | whose namespace,
-      in addition to the ``GLOBALS`` dict in
-      `util.py <https://github.com/mikf/gallery-dl/blob/v1.27.0/gallery_dl/util.py#L566-L578>`__,
-      gets used as |globals parameter|__ for compiled Python expressions.
+    A Python |Module|_ whose namespace,
+    in addition to the ``GLOBALS`` dict in
+    `util.py <https://github.com/mikf/gallery-dl/blob/v1.27.0/gallery_dl/util.py#L566-L578>`__,
+    is used as |globals parameter|__ for compiled Python expressions.
 
 .. |globals parameter| replace:: ``globals`` parameter
 .. __: https://docs.python.org/3/library/functions.html#eval
@@ -7909,6 +8182,27 @@ Description
     The list of signal names to ignore, i.e. set
     `SIG_IGN <https://docs.python.org/3/library/signal.html#signal.SIG_IGN>`_
     as signal handler for.
+
+
+signals-actions
+---------------
+Type
+    ``object`` (`signal` -> `Action(s)`_)
+Example
+    .. code:: json
+
+        {
+            "SIGINT" : "flag download = stop",
+            "SIGUSR1": [
+                "print Received SIGUSR1",
+                "exec notify.sh",
+                "exit 127"
+            ]
+        }
+Description
+    `Action(s)`_ to perform when a
+    `signal <https://docs.python.org/3/library/signal.html>`__
+    is received.
 
 
 subconfigs
@@ -8008,8 +8302,8 @@ How To
 
       * choose a name
       * select "installed app"
-      * set ``http://localhost:6414/`` as "redirect uri"
-      * solve the "I'm not a robot" reCAPTCHA if needed
+      * set "redirect uri" to http://localhost:6414/
+      * solve the "I'm not a robot" challenge if needed
       * click "create app"
 
     * copy the client id (third line, under your application's name and
@@ -8031,10 +8325,15 @@ Type
     ``string``
 How To
     * login and `Apply for an API Key <https://api.smugmug.com/api/developer/apply>`__
-    * use a random name and description,
-      set "Type" to "Application", "Platform" to "All",
-      and "Use" to "Non-Commercial"
-    * fill out the two checkboxes at the bottom and click "Apply"
+    * fill out the form:
+
+      * choose a random name and description
+      * set "Type" to "Application"
+      * set "Platform" to "All"
+      * set "Use" to "Non-Commercial"
+      * tick the two checkboxes at the bottom
+      * click "Apply"
+
     * copy ``API Key`` and ``API Secret``
       and put them in your configuration file
       as ``"api-key"`` and ``"api-secret"``
@@ -8048,10 +8347,14 @@ How To
     * login and visit Tumblr's
       `Applications <https://www.tumblr.com/oauth/apps>`__ section
     * click "Register application"
-    * fill out the form: use a random name and description, set
-      https://example.org/ as "Application Website" and "Default
-      callback URL"
-    * solve Google's "I'm not a robot" challenge and click "Register"
+    * fill out the form:
+
+      * choose a random name and description
+      * set "Application Website" to https://example.org/
+      * set "Default callback URL" to https://example.org/
+      * solve the "I'm not a robot" challenge
+      * click "Register"
+
     * click "Show secret key" (below "OAuth Consumer Key")
     * copy your ``OAuth Consumer Key`` and ``Secret Key``
       and put them in your configuration file
@@ -8100,6 +8403,33 @@ Description
       value (``"2.85"``) or a range  (``"1.5-3.0"``).
 
 
+Module
+------
+Type
+    * ``string``
+    * |Path|_
+Example
+    * ``"gdl_utils"``
+    * ``"~/.local/share/gdl/"``
+    * ``"~/.local/share/gdl_utils.py"``
+Description
+    A Python
+    `Module <https://docs.python.org/3/glossary.html#term-module>`__
+
+    This can be one of
+
+    * the name of an
+      `importable <https://docs.python.org/3/reference/import.html>`__
+      Python module
+    * the |Path|_ to a Python
+      `package <https://docs.python.org/3/glossary.html#term-package>`__
+    * the |Path|_ to a `.py` file
+
+    See
+    `Python/Modules <https://docs.python.org/3/tutorial/modules.html>`__
+    for details.
+
+
 Path
 ----
 Type
@@ -8117,13 +8447,20 @@ Description
     Simple `tilde expansion <https://docs.python.org/3/library/os.path.html#os.path.expanduser>`__
     and `environment variable expansion <https://docs.python.org/3/library/os.path.html#os.path.expandvars>`__
     is supported.
+Note:
+    In Windows environments,
+    both backslashes ``\`` as well as forward slashes ``/``
+    can be used as path separators.
 
-    In Windows environments, backslashes (``"\"``) can, in addition to
-    forward slashes (``"/"``), be used as path separators.
-    Because backslashes are JSON's escape character,
-    they themselves have to be escaped.
-    The path ``C:\path\to\file.ext`` has therefore to be written as
-    ``"C:\\path\\to\\file.ext"`` if you want to use backslashes.
+    However, since backslashes are JSON's escape character,
+    they themselves must be escaped as ``\\``.
+
+    For example, a path like ``C:\path\to\file.ext`` has to be specified as
+
+    * ``"C:\\path\\to\\file.ext"`` when using backslashes
+    * ``"C:/path/to/file.ext"`` when using forward slashes
+
+    in a JSON file.
 
 
 Logging Configuration
@@ -8248,10 +8585,73 @@ Description
         Store files in a ZIP archive
 
 
+Action
+------
+Type
+    ``string``
+Example
+    * ``"exit"``
+    * ``"print Hello World"``
+    * ``"raise AbortExtraction an error occured"``
+    * ``"flag file = terminate"``
+Description
+    An Action_ is parsed as `Action Type`
+    followed by (optional) arguments.
+
+    It is possible to specify more than one ``action``
+    by providing them as a ``list``: ``["<action1>", "<action2>", …]``
+
+    Supported `Action Types`:
+
+    ``status``:
+        | Modify job exit status.
+        | Expected syntax is ``<operator> <value>`` (e.g. ``= 100``).
+
+        Supported operators are
+        ``=`` (assignment),
+        ``&`` (bitwise AND),
+        ``|`` (bitwise OR),
+        ``^`` (bitwise XOR).
+    ``level``:
+        | Modify severity level of the current logging message.
+        | Can be one of ``debug``, ``info``, ``warning``, ``error`` or an integer value.
+    ``print``:
+        Write argument to stdout.
+    ``exec``:
+        Run a shell command.
+    ``abort``:
+        Stop the current extractor run.
+    ``terminate``:
+        Stop the current extractor run, including parent extractors.
+    ``restart``:
+        Restart the current extractor run.
+    ``raise``:
+        Raise an exception.
+
+        This can be an exception defined in
+        `exception.py <https://github.com/mikf/gallery-dl/blob/master/gallery_dl/exception.py>`_
+        or a
+        `built-in exception <https://docs.python.org/3/library/exceptions.html#exception-hierarchy>`_
+        (e.g. ``ZeroDivisionError``)
+    ``flag``:
+        Set a ``flag``.
+
+        | Expected syntax is ``<flag>[ = <value>]`` (e.g. ``post = stop``)
+        | ``<flag>`` can be one of ``file``, ``post``, ``child``, ``download``
+        | ``<value>`` can be one of ``stop``, ``abort``, ``terminate``, ``restart`` (default ``stop``)
+    ``wait``:
+        | Sleep for a given Duration_ or
+        | wait until Enter is pressed when no argument was given.
+    ``exit``:
+        Exit the program with the given argument as exit status.
+
+
 
 .. |ytdl| replace:: `yt-dlp`_/`youtube-dl`_
 .. |ytdl's| replace:: yt-dlp's/youtube-dl's
 .. |ffmpeg| replace:: FFmpeg_
+.. |jinja| replace:: Jinja
+
 
 .. |.netrc| replace:: ``.netrc``
 .. |requests.request()| replace:: ``requests.request()``
@@ -8263,6 +8663,7 @@ Description
 .. |datetime.max| replace:: ``datetime.max``
 .. |Date| replace:: ``Date``
 .. |Duration| replace:: ``Duration``
+.. |Module| replace:: ``Module``
 .. |Path| replace:: ``Path``
 .. |Last-Modified| replace:: ``Last-Modified``
 .. |Logging Configuration| replace:: ``Logging Configuration``
@@ -8280,6 +8681,7 @@ Description
 .. _deviantart.comments: `extractor.deviantart.comments`_
 .. _postprocessors: `extractor.*.postprocessors`_
 .. _download archive: `extractor.*.archive`_
+.. _Action(s): Action_
 
 .. _.netrc:             https://stackoverflow.com/tags/.netrc/info
 .. _Last-Modified:      https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.29

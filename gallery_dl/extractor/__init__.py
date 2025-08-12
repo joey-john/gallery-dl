@@ -35,6 +35,7 @@ modules = [
     "blogger",
     "bluesky",
     "boosty",
+    "booth",
     "bunkr",
     "catbox",
     "chevereto",
@@ -92,12 +93,14 @@ modules = [
     "issuu",
     "itaku",
     "itchio",
+    "iwara",
     "jschan",
     "kabeuchi",
     "keenspot",
     "kemono",
     "khinsider",
     "komikcast",
+    "leakgallery",
     "lensdump",
     "lexica",
     "lightroom",
@@ -105,6 +108,7 @@ modules = [
     "lofter",
     "luscious",
     "lynxchan",
+    "madokami",
     "mangadex",
     "mangafox",
     "mangahere",
@@ -207,6 +211,7 @@ modules = [
     "wikiart",
     "wikifeet",
     "wikimedia",
+    "xasiat",
     "xfolio",
     "xhamster",
     "xvideos",
@@ -233,8 +238,7 @@ modules = [
 def find(url):
     """Find a suitable extractor for the given URL"""
     for cls in _list_classes():
-        match = cls.pattern.match(url)
-        if match:
+        if match := cls.pattern.match(url):
             return cls(match)
     return None
 
@@ -249,8 +253,7 @@ def add(cls):
 
 def add_module(module):
     """Add all extractors in 'module' to the list of available extractors"""
-    classes = _get_classes(module)
-    if classes:
+    if classes := _get_classes(module):
         if isinstance(classes[0].pattern, str):
             for cls in classes:
                 cls.pattern = re_compile(cls.pattern)

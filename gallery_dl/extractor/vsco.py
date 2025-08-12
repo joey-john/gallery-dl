@@ -22,6 +22,7 @@ class VscoExtractor(Extractor):
     directory_fmt = ("{category}", "{user}")
     filename_fmt = "{id}.{extension}"
     archive_fmt = "{id}"
+    tls12 = False
 
     def __init__(self, match):
         Extractor.__init__(self, match)
@@ -79,7 +80,7 @@ class VscoExtractor(Extractor):
     def _extract_preload_state(self, url):
         page = self.request(url, notfound=self.subcategory).text
         return util.json_loads(text.extr(page, "__PRELOADED_STATE__ = ", "<")
-                               .replace('"prevPageToken":undefined,', ''))
+                               .replace('":undefined', '":null'))
 
     def _pagination(self, url, params, token, key, extra=None):
         headers = {

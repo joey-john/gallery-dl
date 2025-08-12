@@ -7,7 +7,7 @@
 # it under the terms of the GNU General Public License version 2 as
 # published by the Free Software Foundation.
 
-""""""
+"""Initialize extractor modules"""
 
 import re
 import logging
@@ -29,179 +29,96 @@ LICENSE = """\
 """
 
 
-def init_extractor_module(opts):
-    try:
-        create_extractor_module(opts)
-    except FileExistsError:
-        LOG.warning("… already present")
-    except Exception as exc:
-        LOG.error("%s: %s", exc.__class__.__name__, exc, exc_info=exc)
+def init_extractor_module(args):
+    if args.init_module:
+        try:
+            create_extractor_module(args)
+        except FileExistsError:
+            LOG.warning("… already present")
+        except Exception as exc:
+            LOG.error("%s: %s", exc.__class__.__name__, exc, exc_info=exc)
 
-    try:
-        create_test_results_file(opts)
-    except FileExistsError:
-        LOG.warning("… already present")
-    except Exception as exc:
-        LOG.error("%s: %s", exc.__class__.__name__, exc, exc_info=exc)
-
-    if msg := insert_into_modules_list(opts):
-        LOG.warning(msg)
-
-    if opts.get("site_name"):
-        if msg := insert_into_supportedsites(opts):
+        if msg := insert_into_modules_list(args):
             LOG.warning(msg)
 
+    try:
+        create_test_results_file(args)
+    except FileExistsError:
+        LOG.warning("… already present")
+    except Exception as exc:
+        LOG.error("%s: %s", exc.__class__.__name__, exc, exc_info=exc)
 
-###############################################################################
-# Code Modification ###########################################################
-
-def insert_into_modules_list(opts=NONE):
-    category = opts["category"]
-    LOG.info("Adding '%s' to extractor modules list", category)
-
-    path = util.path("gallery_dl", "extractor", "__init__.py")
-    with open(path) as fp:
-        lines = fp.readlines()
-
-    module_name = f'    "{category}",\n'
-    if module_name in lines:
-        return "… already present"
-
-    compare = False
-    for idx, line in enumerate(lines):
-        if compare:
-            cat = text.extr(line, '"', '"')
-            if cat == category:
-                return "… already present"
-            if cat > category:
-                break
-        elif line.startswith("modules = "):
-            compare = True
-
-    lines.insert(idx, module_name)
-    with util.lazy(path) as fp:
-        fp.writelines(lines)
-
-
-def insert_into_supportedsites(opts):
-    category = opts["category"]
-    LOG.info("Adding '%s' to scripts/supportedsites.py category list",
-             category)
-
-    path = util.path("scripts", "supportedsites.py")
-    with open(path) as fp:
-        lines = fp.readlines()
-
-    compare = False
-    for idx, line in enumerate(lines):
-        if compare:
-            cat = text.extr(line, '"', '"')
-            if cat == category:
-                return "… already present"
-            if cat > category:
-                break
-        elif line.startswith("CATEGORY_MAP = "):
-            compare = True
-
-    ws = " " * max(15 - len(category), 0)
-    asd = f'''    "{category}"{ws}: "{opts['site_name']}",\n'''
-    lines.insert(idx, asd)
-
-    with util.lazy(path) as fp:
-        fp.writelines(lines)
-
-
-def insert_test_result(opts):
-    if url := opts["url"]:
-        from gallery_dl.extractor import find
-        extr = opts["extractor"] = find(url)
-        cat = extr.category
-        sub = extr.subcategory
-        gen = generate_test_result_extractor
-    else:
-        cat = opts["category"]
-        sub = opts["subcategory"]
-        gen = generate_test_result_basic
-
-    path = util.path("test", "results", f"{cat}.py")
-    LOG.info("Adding %stest result skeleton into '%s'",
-             sub + " " if sub else "", path)
-
-    with open(path) as fp:
-        lines = fp.readlines()
-
-    lines.insert(-2, gen(opts))
-
-    with util.lazy(path) as fp:
-        fp.writelines(lines)
+    if args.site_name:
+        if msg := insert_into_supportedsites(args):
+            LOG.warning(msg)
 
 
 ###############################################################################
 # File Creation ###############################################################
 
-def create_extractor_module(opts=NONE):
-    cat = opts["category"]
+def create_extractor_module(args):
+    category = args.category
 
-    path = util.path("gallery_dl", "extractor", f"{cat}.py")
-    LOG.info("Creating '%s'", path)
+    path = util.path("gallery_dl", "extractor", f"{category}.py")
+    LOG.info("Creating '%s'", util.trim(path))
 
-    type = opts.get("type")
+    type = args.type
     if type == "manga":
         generate_extractors = generate_extractors_manga
+    elif type == "user":
+        generate_extractors = generate_extractors_user
     else:
         generate_extractors = generate_extractors_basic
 
-    with open(path, opts["open_mode"], encoding="utf-8") as fp:
-        if copyright := opts.get("copyright", ""):
-            copyright = f"# Copyright {dt.date.today().year} {copyright}\n#"
+    with util.open(path, args.open_mode) as fp:
+        if copyright := args.copyright:
+            copyright = f"\n# Copyright {dt.date.today().year} {copyright}\n#"
 
         fp.write(f'''\
-{ENCODING}
-{copyright}
+{ENCODING}{copyright}
 {LICENSE}
-"""Extractors for {opts["root"]}/"""
+"""Extractors for {args.root}/"""
 
-{generate_extractors(opts)}\
+{generate_extractors(args)}\
 ''')
 
 
-def generate_extractors_basic(opts):
-    cat = opts["category"]
-    root = opts["root"]
+def generate_extractors_basic(args):
+    cat = args.category
 
     return f'''\
 from .common import Extractor, Message
 from .. import text
 
-{build_base_pattern(opts)}
+{build_base_pattern(args)}
 
 class {cat.capitalize()}Extractor(Extractor):
     """Base class for {cat} extractors"""
     category = "{cat}"
-    root = "{root}"
+    root = "{args.root}"
 '''
 
 
-def generate_extractors_manga(opts):
-    cat = opts["category"]
+def generate_extractors_manga(args):
+    cat = args.category
     ccat = cat.capitalize()
 
     return f'''\
 from .common import ChapterExtractor, MangaExtractor
 from .. import text
 
-{build_base_pattern(opts)}
+{build_base_pattern(args)}
 
 class {ccat}Base():
     """Base class for {cat} extractors"""
     category = "{cat}"
-    root = "{opts["root"]}"
+    root = "{args.root}"
 
 
 class {ccat}ChapterExtractor({ccat}Base, ChapterExtractor):
     """Extractor for {cat} manga chapters"""
-    pattern = BASE_PATTERN + r"/PATH"
-    example = ""
+    pattern = rf"{{BASE_PATTERN}}/PATH"
+    example = "{args.root}/..."
 
     def __init__(self, match):
         url = f"{{self.root}}/PATH"
@@ -232,8 +149,8 @@ class {ccat}ChapterExtractor({ccat}Base, ChapterExtractor):
 class {ccat}MangaExtractor({ccat}Base, MangaExtractor):
     """Extractor for {cat} manga"""
     chapterclass = {ccat}ChapterExtractor
-    pattern = BASE_PATTERN + r"/PATH"
-    example = ""
+    pattern = rf"{{BASE_PATTERN}}/PATH"
+    example = "{args.root}/..."
 
     def __init__(self, match):
         url = f"{{self.root}}/PATH"
@@ -249,101 +166,146 @@ class {ccat}MangaExtractor({ccat}Base, MangaExtractor):
 '''
 
 
-def build_base_pattern(opts):
+def generate_extractors_user(args):
+    cat = args.category
+    ccat = cat.capitalize()
+
+    return f'''\
+from .common import Extractor, Message, Dispatch
+from .. import text
+
+{build_base_pattern(args)}
+USER_PATTERN = rf"{{BASE_PATTERN}}/([^/?#]+)"
+
+class {ccat}Extractor(Extractor):
+    """Base class for {cat} extractors"""
+    category = "{cat}"
+    root = "{args.root}"
+
+
+class {ccat}UserExtractor(Dispatch, {ccat}Extractor)
+    """Extractor for {cat} user profiles"""
+    pattern = rf"{{USER_PATTERN}}/?(?:$|\\?|#)"
+    example = "{args.root}/USER/"
+
+    def items(self):
+        base = f"{{self.root}}/"
+        return self._dispatch_extractors((
+            ({ccat}InfoExtractor, f"{{base}}info"),
+        ), ("posts",))
+'''
+
+
+def build_base_pattern(args):
+    domain = args.domain
+    if domain.count(".") > 1:
+        subdomain, domain, tld = domain.rsplit(".", 2)
+        domain = f"{domain}.{tld}"
+        if subdomain == "www":
+            subdomain = "(?:www\\.)?"
+        else:
+            subdomain = re.escape(subdomain + ".")
+    else:
+        subdomain = "(?:www\\.)?"
+
     return f"""\
-BASE_PATTERN = r"(?:https?://)?(?:www\\.)?{re.escape(opts["domain"])}"
+BASE_PATTERN = r"(?:https?://)?{subdomain}{re.escape(domain)}"
 """
 
 
 ###############################################################################
 # Test Results ################################################################
 
-def create_test_results_file(opts=NONE):
-    path = util.path("test", "results", f"{opts['category']}.py")
-    LOG.info("Creating '%s'", path)
+def create_test_results_file(args):
+    path = util.path("test", "results", f"{args.category}.py")
+    LOG.info("Creating '%s'", util.trim(path))
 
-    with open(path, opts["open_mode"], encoding="utf-8") as fp:
-        module_name, import_stmt = generate_test_result_import(opts)
-
-        fp.write(f'''\
+    import_stmt = generate_test_result_import(args)
+    with util.open(path, "x") as fp:
+        fp.write(f"""\
 {ENCODING}
 {LICENSE}
 {import_stmt}
 
 __tests__ = (
-
 )
-''')
+""")
 
 
-def generate_test_result_import(opts):
-    cat = opts["category"]
+def generate_test_result_import(args):
+    cat = args.category
 
     if cat[0].isdecimal():
-        module = f"_{cat}"
         import_stmt = f"""\
 gallery_dl = __import__("gallery_dl.extractor.{cat}")
-{module} = getattr(gallery_dl.extractor, "{cat}")
+_{cat} = getattr(gallery_dl.extractor, "{cat}")
 """
     else:
-        module = cat
         import_stmt = f"""\
 from gallery_dl.extractor import {cat}
 """
 
-    return module, import_stmt
+    return import_stmt
 
 
-def generate_test_result_basic(opts):
-    cat = opts["category"]
-    sub = opts["subcategory"]
-    extr_name = f"{cat.capitalize()}{sub.capitalize()}Extractor"
-    module_name, _ = generate_test_result_import(opts)
+###############################################################################
+# Code Modification ###########################################################
 
-    return f"""
-{{
-    "#url"     : "{opts['url']}",
-    "#comment" : "",
-    "#class"   : {module_name}.{extr_name},
-}}
-"""
+def insert_into_modules_list(args):
+    category = args.category
+    LOG.info("Adding '%s' to gallery_dl/extractor/__init__.py modules list",
+             category)
+
+    path = util.path("gallery_dl", "extractor", "__init__.py")
+    with util.open(path) as fp:
+        lines = fp.readlines()
+
+    module_name = f'    "{category}",\n'
+    if module_name in lines:
+        return "… already present"
+
+    compare = False
+    for idx, line in enumerate(lines):
+        if compare:
+            cat = text.extr(line, '"', '"')
+            if cat == category:
+                return "… already present"
+            if cat > category or cat == "booru":
+                break
+        elif line.startswith("modules = "):
+            compare = True
+
+    lines.insert(idx, module_name)
+    with util.lazy(path) as fp:
+        fp.writelines(lines)
 
 
-def generate_test_result_extractor(opts):
-    from gallery_dl.extractor import common
+def insert_into_supportedsites(args):
+    category = args.category
+    LOG.info("Adding '%s' to scripts/supportedsites.py category list",
+             category)
 
-    extr = opts["extractor"]
-    extr_name = extr.__class__.__name__
-    module_name = extr.__module__.rpartition(".")[2]
+    path = util.path("scripts", "supportedsites.py")
+    with util.open(path) as fp:
+        lines = fp.readlines()
 
-    head = f"""
-{{
-    "#url"     : "{extr.url}",
-    "#comment" : "",
-    "#class"   : {module_name}.{extr_name},\
-"""
+    compare = False
+    for idx, line in enumerate(lines):
+        if compare:
+            cat = text.extr(line, '"', '"')
+            if cat == category:
+                return "… already present"
+            if cat > category:
+                break
+        elif line.startswith("CATEGORY_MAP = "):
+            compare = True
 
-    if isinstance(extr, common.GalleryExtractor):
-        body = """
-    "#pattern" : r"",
-    "#count"   : 123,
-"""
+    ws = " " * max(15 - len(category), 0)
+    line = f'''    "{category}"{ws}: "{args.site_name}",\n'''
+    lines.insert(idx, line)
 
-    elif isinstance(extr, common.MangaExtractor):
-        extr_name = extr_name.replace("MangaEx", "ChapterEx")
-        body = f"""
-    "#pattern" : {module_name}.{extr_name}.pattern,
-    "#count"   : 123,
-"""
-
-    else:
-        body = ""
-
-    tail = """\
-}},
-"""
-
-    return f"{head}{body}{tail}"
+    with util.lazy(path) as fp:
+        fp.writelines(lines)
 
 
 ###############################################################################
@@ -352,61 +314,42 @@ def generate_test_result_extractor(opts):
 def parse_args(args=None):
     parser = argparse.ArgumentParser(args)
 
-    parser.add_argument("-c", "--copyright", metavar="NAME", default="Y")
-    parser.add_argument("-T", "--type", metavar="TYPE")
-    parser.add_argument("-r", "--root", metavar="ROOT_URL")
-    parser.add_argument("-s", "--site", metavar="TITLE")
-    parser.add_argument("-u", "--url" , metavar="URL", default="")
+    parser.add_argument(
+        "-s", "--site",
+        dest="site_name", metavar="TITLE")
+    parser.add_argument(
+        "-c", "--copyright",
+        dest="copyright", metavar="NAME")
+    parser.add_argument(
+        "-C",
+        dest="copyright", action="store_const", const="Mike Fährmann")
     parser.add_argument(
         "-F", "--force",
-        action="store_const", const="w", default="x", dest="open_mode")
+        dest="open_mode", action="store_const", const="w", default="x")
     parser.add_argument(
-        "-t", "--test",
-        action="store_const", const="test", dest="mode")
+        "-M", "--no-module",
+        dest="init_module", action="store_false")
     parser.add_argument(
-        "-M", "--manga",
-        action="store_const", const="manga", dest="type")
+        "-t", "--type",
+        dest="type", metavar="TYPE")
     parser.add_argument(
-        "-B", "--base",
-        action="store_const", const="base", dest="type")
+        "--manga",
+        dest="type", action="store_const", const="manga")
     parser.add_argument(
-        "-U", "--user",
-        action="store_const", const="user", dest="type")
+        "--base",
+        dest="type", action="store_const", const="base")
+    parser.add_argument(
+        "--user",
+        dest="type", action="store_const", const="user")
 
-    parser.add_argument("category", default="")
-    parser.add_argument("subcategory", nargs="?", default="")
+    parser.add_argument("category")
+    parser.add_argument("root", nargs="?")
 
-    return parser.parse_args()
-
-
-def parse_opts(args=None):
-    args = parse_args(args)
-
-    if not (args.mode or args.type or args.url or args.root):
-        LOG.error("--root required")
-        raise SystemExit(2)
-
-    opts = {
-        "category"   : args.category,
-        "subcategory": args.subcategory,
-        "site_name"  : args.site,
-        "mode"       : args.mode,
-        "type"       : args.type,
-        "url"        : args.url,
-        "results"    : False,
-        "open_mode"  : args.open_mode,
-    }
-
-    if copyright := args.copyright:
-        if len(copyright) == 1:
-            copyright = "Mike Fährmann"
-        opts["copyright"] = copyright
-    else:
-        opts["copyright"] = ""
+    args = parser.parse_args()
 
     if root := args.root:
         if "://" in root:
-            root.rstrip("/")
+            root = root.rstrip("/")
             domain = root[root.find("://")+3:]
         else:
             root = root.strip(":/")
@@ -416,21 +359,19 @@ def parse_opts(args=None):
         if domain.startswith("www."):
             domain = domain[4:]
 
-        opts["root"] = root
-        opts["domain"] = domain
+        args.root = root
+        args.domain = domain
+    elif args.init_module:
+        parser.error("'root' URL required")
     else:
-        opts["root"] = opts["domain"] = ""
+        args.domain = ""
 
-    return opts
+    return args
 
 
 def main():
-    opts = parse_opts()
-
-    if opts["url"] or opts["mode"] == "test":
-        insert_test_result(opts)
-    else:
-        init_extractor_module(opts)
+    args = parse_args()
+    init_extractor_module(args)
 
 
 if __name__ == "__main__":
