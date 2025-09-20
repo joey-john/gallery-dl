@@ -86,26 +86,27 @@ __tests__ = (
     "#options" : {"max-posts": 100, "endpoint": "posts"},
     "#count"   : range(200, 400),
 
-    "added"      : {str, None},
     "archives"   : [],
     "attachments": list,
-    "captions"   : None,
-    "content"    : str,
     "count"      : int,
     "num"        : int,
-    "date"       : "type:datetime",
-    "edited"     : {str, None},
-    "embed"      : dict,
     "id"         : str,
-    "poll"       : None,
+    "date"       : "type:datetime",
     "published"  : str,
     "service"    : "patreon",
-    "shared_file": False,
     "subcategory": "patreon",
-    "tags"       : {str, None},
     "title"      : str,
     "user"       : "881792",
     "username"   : "diives",
+
+    "!added"      : {str, None},
+    "!captions"   : None,
+    "!content"    : str,
+    "!edited"     : {str, None},
+    "!embed"      : dict,
+    "!poll"       : None,
+    "!shared_file": False,
+    "!tags"       : {str, None},
 },
 
 {
@@ -483,7 +484,7 @@ __tests__ = (
         "public_id": "soso",
         "relation_id": None,
         "service": "fanbox",
-        "updated": "2025-03-29T05:44:56.747243",
+        "updated": "iso:datetime",
     },
     "tags": [
         "うごイラ",
@@ -509,6 +510,25 @@ __tests__ = (
         "/dd/35/dd35c43d8a93f1806f094d9331a17c5037ed5d93e0f30c28d3cca2056b400aa6.png",
         "/25/48/254864eb2523ab48be8d3fb7ad21ab3a127d61736b76602f8421cde88700a174.png",
     },
+},
+
+{
+    "#url"     : "https://kemono.cr/patreon/user/108002999/post/136454591",
+    "#comment" : "'.zip' archive with '.bin' extension (#8156)",
+    "#category": ("", "kemono", "patreon"),
+    "#class"   : kemono.KemonoPostExtractor,
+    "#range"   : "0",
+    "#metadata": "post",
+
+    "archives": [{
+        "extension": "zip",
+        "filename": "#5 Kitagawa Marin",
+        "hash": "46cc99d4114906524fe52a6f772c51ab59ca1c3c0f6a8a0d3588a861b0d59ced",
+        "name": "#5 Kitagawa Marin.zip",
+        "path": "/46/cc/46cc99d4114906524fe52a6f772c51ab59ca1c3c0f6a8a0d3588a861b0d59ced.bin",
+        "type": "archive",
+        "url": "https://kemono.cr/data/46/cc/46cc99d4114906524fe52a6f772c51ab59ca1c3c0f6a8a0d3588a861b0d59ced.bin"
+    }],
 },
 
 {

@@ -277,6 +277,19 @@ Description
     * ``"windows"``: ``". "``
 
 
+extractor.*.path-convert
+------------------------
+Type
+    `Conversion(s)`_
+Example
+    * ``"g"``
+    * ``"Wl"``
+Description
+    `Conversion(s)`_ to apply to each path segment after
+    `path-restrict <extractor.*.path-restrict_>`__
+    replacements.
+
+
 extractor.*.path-extended
 -------------------------
 Type
@@ -414,6 +427,7 @@ Default
         ``[Danbooru]``,
         ``[E621]``,
         ``[foolfuuka]:search``,
+        ``hdoujin``,
         ``itaku``,
         ``newgrounds``,
         ``[philomena]``,
@@ -423,7 +437,9 @@ Default
         ``pornpics``,
         ``schalenetwork``,
         ``scrolller``,
+        ``sizebooru``,
         ``soundgasm``,
+        ``thehentaiworld``,
         ``urlgalleries``,
         ``vk``,
         ``webtoons``,
@@ -432,6 +448,7 @@ Default
         ``zerochan``
     * ``"1.0"``
         ``furaffinity``
+        ``rule34``
     * ``"1.0-2.0"``
         ``flickr``,
         ``pexels``,
@@ -1089,7 +1106,7 @@ extractor.*.actions
 -------------------
 Type
     * ``object`` (`pattern` -> `Action(s)`_)
-    * ``list`` of ``lists`` with `pattern` -> `Action(s)`_ pairs as elements
+    * ``list`` of [`pattern`, `Action(s)`_] pairs
 Example
     .. code:: json
 
@@ -1121,11 +1138,12 @@ Description
     ``pattern`` is parsed as severity level (``debug``, ``info``, ``warning``, ``error``, or integer value)
     followed by an optional
     `Python Regular Expression <https://docs.python.org/3/library/re.html#regular-expression-syntax>`__
-    separated by a colon ``:``
+    separated by a colon:
+    ``<level>:<re>``
 
     Using ``*`` as `level` or leaving it empty
-    matches logging messages of all levels
-    (e.g. ``*:<re>`` or ``:<re>``).
+    matches logging messages of all levels:
+    ``*:<re>`` or ``:<re>``
 
 
 extractor.*.postprocessors
@@ -1980,6 +1998,18 @@ Description
     `quality <extractor.civitai.quality_>`__ ones.
 
 
+extractor.civitai.search-models.token
+-------------------------------------
+extractor.civitai.search-images.token
+-------------------------------------
+Type
+    ``string``
+Default
+    ``"8c46eb2508e21db1e9828a97968d91ab1ca1caa5f70a00e88a2ba1e286603b61"``
+Description
+    ``Authorization`` header value used for `/multi-search` queries.
+
+
 extractor.comick.lang
 ---------------------
 Type
@@ -2007,6 +2037,20 @@ Description
 
     Setting this option to ``"auto"``
     uses the same domain as a given input URL.
+
+
+extractor.cyberfile.password
+----------------------------
+Type
+    ``string``
+Default
+    ``""``
+Description
+    Password value used to access protected files and folders.
+
+    Note: Leave this value empty or undefined
+    to be interactively prompted for a password when needed
+    (see `getpass() <https://docs.python.org/3/library/getpass.html#getpass.getpass>`__).
 
 
 extractor.[Danbooru].external
@@ -2432,6 +2476,14 @@ Description
 
     | Each format is parsed as ``SIZE.EXT``.
     | Leave ``SIZE`` empty to download the regular, small avatar format.
+Note
+    | Consider updating
+      `archive-format <extractor.*.archive-format_>`__
+      for ``avatar`` results to
+    | ``"a_{_username}_{index}{title[6:]}.{extension}"``
+    | or similar when using an
+      `archive <extractor.*.archive_>`__
+      to be able to handle different formats.
 
 
 extractor.deviantart.folder.subfolders
@@ -2520,6 +2572,16 @@ Description
     Note: Changing this setting is normally not necessary. When the value is
     greater than the per-page limit, gallery-dl will stop after the first
     batch. The value cannot be less than 1.
+
+
+extractor.erome.user.reposts
+----------------------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Include reposts when extracting albums from a user profile.
 
 
 extractor.exhentai.domain
@@ -2766,6 +2828,28 @@ Description
     `fanbox.comments <extractor.fanbox.comments_>`__
 
 
+extractor.fansly.formats
+------------------------
+Type
+    ``list`` of ``integers``
+Default
+    ``[1, 2, 3, 4, 302, 303]``
+Description
+    List of file formats to consider during format selection.
+
+
+extractor.fansly.token
+----------------------
+Type
+    ``string``
+Example
+    ``"kX7pL9qW3zT2rY8mB5nJ4vC6xF1tA0hD8uE2wG9yR3sQ7iZ4oM5jN6cP8lV0bK2tU9aL1eW"``
+Description
+    ``authorization`` header value
+    used for requests to ``https://apiv3.fansly.com/api``
+    to access locked content.
+
+
 extractor.flickr.access-token & .access-token-secret
 ----------------------------------------------------
 Type
@@ -2943,8 +3027,9 @@ Type
 Default
     ``null``
 Description
-    Values from the API Access Credentials section found at the bottom of your
-    `Account Options <https://gelbooru.com/index.php?page=account&s=options>`__
+    Values from the `API Access Credentials` section
+    found at the bottom of your account's
+    `Options <https://gelbooru.com/index.php?page=account&s=options>`__
     page.
 
 
@@ -3007,6 +3092,70 @@ Default
     ``false``
 Description
     Recursively download files from subfolders.
+
+
+extractor.hdoujin.crt
+---------------------
+Type
+    ``string``
+Example
+    * ``"0542daa9-352c-4fd5-a497-6c6d5cf07423"``
+    * ``"/12345/a1b2c3d4e5f6?crt=0542daa9-352c-4fd5-a497-6c6d5cf07423"``
+Description
+    The ``crt`` query parameter value
+    sent when fetching gallery data.
+
+    To get this value:
+
+    * Open your browser's Developer Tools (F12)
+    * Select `Network` -> `XHR`
+    * Open a gallery page
+    * Select the last `Network` entry and copy its ``crt`` value
+
+    Note: You will also need your browser's
+    `user-agent <extractor.*.user-agent_>`__
+
+
+extractor.hdoujin.format
+------------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``["0", "1600", "1280", "980", "780"]``
+Description
+    Name(s) of the image format to download.
+
+    When more than one format is given, the first available one is selected.
+
+    | Possible formats are
+    | ``"780"``, ``"980"``, ``"1280"``, ``"1600"``, ``"0"`` (original)
+
+
+extractor.hdoujin.tags
+----------------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Group ``tags`` by type and
+    provide them as ``tags_<type>`` metadata fields,
+    for example ``tags_artist`` or ``tags_character``.
+
+
+extractor.hdoujin.token
+-----------------------
+Type
+    ``string``
+Example
+    * ``"3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+    * ``"Bearer 3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+    * ``"Authorization: Bearer 3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+Description
+    ``Authorization`` header value
+    used for requests to ``https://api.hdoujin.org``
+    to access ``favorite`` galleries.
 
 
 extractor.hentaifoundry.descriptions
@@ -3395,22 +3544,11 @@ Default
 Description
     API endpoint to use for retrieving creator posts.
 
-    ``"legacy"``
-        | Use the results from
-          `/v1/{service}/user/{creator_id}/posts-legacy <https://kemono.su/documentation/api#operations-default-get_v1__service__user__creator_id__posts_legacy>`__
-        | Provides less metadata, but is more reliable at returning all posts.
-        | Supports filtering results by ``tag`` query parameter.
-    ``"legacy+"``
-        | Use the results from
-          `/v1/{service}/user/{creator_id}/posts-legacy <https://kemono.su/documentation/api#operations-default-get_v1__service__user__creator_id__posts_legacy>`__
-          to retrieve post IDs
-        | and one request to
-          `/v1/{service}/user/{creator_id}/post/{post_id} <https://kemono.su/documentation/api#operations-Posts-get_v1__service__user__creator_id__post__post_id_>`__
-          to get a full set of metadata for each.
-    ``"posts"``
-        | Use the results from
-          `/v1/{service}/user/{creator_id} <https://kemono.su/documentation/api#operations-Posts-get_v1__service__user__creator_id_>`__
-        | Provides more metadata, but might not return a creator's first/last posts.
+    ``"posts"`` | ``"legacy"``
+        Provides only limited metadata.
+    ``"posts+"`` | ``"legacy+"``
+        Provides full metadata,
+        but requires an additional API request for each post.
 
 
 extractor.kemono.favorites
@@ -3512,47 +3650,6 @@ Description
 
     If the selected format is not available,
     the first in the list gets chosen (usually `mp3`).
-
-
-extractor.schalenetwork.cbz
----------------------------
-Type
-    ``bool``
-Default
-    ``true``
-Description
-    Download each gallery as a single ``.cbz`` file.
-
-    Disabling this option causes a gallery
-    to be downloaded as individual image files.
-
-
-extractor.schalenetwork.format
-------------------------------
-Type
-    * ``string``
-    * ``list`` of ``strings``
-Default
-    ``["0", "1600", "1280", "980", "780"]``
-Description
-    Name(s) of the image format to download.
-
-    When more than one format is given, the first available one is selected.
-
-    | Possible formats are
-    | ``"780"``, ``"980"``, ``"1280"``, ``"1600"``, ``"0"`` (original)
-
-
-extractor.schalenetwork.tags
-----------------------------
-Type
-    ``bool``
-Default
-    ``false``
-Description
-    Group ``tags`` by type and
-    provide them as ``tags_<type>`` metadata fields,
-    for example ``tags_artist`` or ``tags_character``.
 
 
 extractor.lolisafe.domain
@@ -4482,6 +4579,32 @@ Description
     or ``"hq"`` if not present.
 
 
+extractor.reddit.api
+--------------------
+Type
+    ``string``
+Default
+    ``"oauth"``
+Description
+    Selects which API endpoints to use.
+
+    ``"oauth"``
+        Use the OAuth API at ``https://oauth.reddit.com``
+
+        Requires
+        `client-id & user-agent <extractor.reddit.client-id & .user-agent_>`__
+        and uses a
+        `refresh token <extractor.reddit.refresh-token_>`__
+        for authentication.
+
+    ``"rest"``
+        Use the REST API at ``https://www.reddit.com``
+
+        Uses
+        `cookies <extractor.*.cookies_>`__
+        for authentication.
+
+
 extractor.reddit.comments
 -------------------------
 Type
@@ -4542,6 +4665,22 @@ Example
     ``"6kmzv2"``
 Description
     Ignore all submissions posted before/after the submission with this ID.
+
+
+extractor.reddit.limit
+----------------------
+Type
+    ``integer``
+Default
+    ``null``
+Description
+    Number of results to return in a single API query.
+
+    This value specifies the ``limit`` parameter
+    used for API requests when retrieving paginated results.
+
+    ``null`` means not including this parameter at all
+    and letting Reddit chose a default.
 
 
 extractor.reddit.previews
@@ -4648,8 +4787,25 @@ Description
     restrict it to only one possible format.
 
 
+extractor.rule34.api-key & .user-id
+-----------------------------------
+Type
+    ``string``
+Default
+    ``null``
+Description
+    Values from the `API Access Credentials` section
+    found near the bottom of your account's
+    `Options <https://rule34.xxx/index.php?page=account&s=options>`__
+    page.
+
+    Enable `Generate New Key?` and click `Save`
+    if the value after ``&api_key=`` is empty,
+    e.g. ``&api_key=&user_id=12345``
+
+
 extractor.rule34xyz.format
----------------------------
+--------------------------
 Type
     * ``string``
     * ``list`` of ``strings``
@@ -4726,6 +4882,70 @@ Description
     Download videos.
 
 
+extractor.schalenetwork.crt
+---------------------------
+Type
+    ``string``
+Example
+    * ``"0542daa9-352c-4fd5-a497-6c6d5cf07423"``
+    * ``"/12345/a1b2c3d4e5f6?crt=0542daa9-352c-4fd5-a497-6c6d5cf07423"``
+Description
+    The ``crt`` query parameter value
+    sent when fetching gallery data.
+
+    To get this value:
+
+    * Open your browser's Developer Tools (F12)
+    * Select `Network` -> `XHR`
+    * Open a gallery page
+    * Select the last `Network` entry and copy its ``crt`` value
+
+    Note: You will also need your browser's
+    `user-agent <extractor.*.user-agent_>`__
+
+
+extractor.schalenetwork.format
+------------------------------
+Type
+    * ``string``
+    * ``list`` of ``strings``
+Default
+    ``["0", "1600", "1280", "980", "780"]``
+Description
+    Name(s) of the image format to download.
+
+    When more than one format is given, the first available one is selected.
+
+    | Possible formats are
+    | ``"780"``, ``"980"``, ``"1280"``, ``"1600"``, ``"0"`` (original)
+
+
+extractor.schalenetwork.tags
+----------------------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Group ``tags`` by type and
+    provide them as ``tags_<type>`` metadata fields,
+    for example ``tags_artist`` or ``tags_character``.
+
+
+extractor.schalenetwork.token
+-----------------------------
+Type
+    ``string``
+Example
+    * ``"3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+    * ``"Bearer 3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+    * ``"Authorization: Bearer 3f1a9b72-4e4d-4f4e-9e5d-4a2b99f7c893"``
+Description
+    ``Authorization`` header value
+    used for requests to ``https://api.schale.network``
+    to access ``favorite`` galleries.
+
+
 extractor.sexcom.gifs
 ---------------------
 Type
@@ -4734,6 +4954,28 @@ Default
     ``true``
 Description
     Download animated images as ``.gif`` instead of ``.webp``
+
+
+extractor.sizebooru.metadata
+----------------------------
+Type
+    ``bool``
+Default
+    ``false``
+Description
+    Extract additional metadata:
+
+    * ``approver``
+    * ``artist``
+    * ``date``
+    * ``date_approved``
+    * ``favorite``
+    * ``source``
+    * ``tags``
+    * ``uploader``
+    * ``views``
+Note
+    This requires 1 additional HTTP request per post.
 
 
 extractor.skeb.article
@@ -4752,10 +4994,12 @@ Type
     * ``string``
     * ``list`` of ``strings``
 Default
-    ``"works"``
+    * ``["works", "sentrequests"]``
+      if `sent-requests <extractor.skeb.sent-requests_>`__ are enabled
+    * ``["works"]`` otherwise
 Example
-    * ``"works,sent-requests"``
-    * ``["works", "sent-requests"]``
+    * ``"works,sentrequests"``
+    * ``["works", "sentrequests"]``
 Description
     A (comma-separated) list of subcategories to include
     when processing a user profile.
@@ -4763,7 +5007,7 @@ Description
     Possible values are
 
     * ``"works"``
-    * ``"sent-requests"``
+    * ``"sentrequests"``
 
     It is possible to use ``"all"`` instead of listing all values separately.
 
@@ -5159,7 +5403,8 @@ extractor.tumblr.pagination
 Type
     ``string``
 Default
-    ``"offset"``
+    * ``"before"`` if `date-max <extractor.tumblr.date-min & .date-max_>`__ is set
+    * ``"offset"`` otherwise
 Description
     Controls how to paginate over blog posts.
 
@@ -5418,14 +5663,16 @@ Description
     when processing a user profile.
 
     Possible values are
-    ``"info"``,
-    ``"avatar"``,
-    ``"background"``,
-    ``"timeline"``,
-    ``"tweets"``,
-    ``"media"``,
-    ``"replies"``,
-    ``"likes"``.
+
+    * ``"info"``
+    * ``"avatar"``
+    * ``"background"``
+    * ``"timeline"``
+    * ``"tweets"``
+    * ``"media"``
+    * ``"replies"``
+    * ``"highlights"``
+    * ``"likes"``
 
     It is possible to use ``"all"`` instead of listing all values separately.
 
@@ -5580,6 +5827,44 @@ Description
 
     If this value is ``"original"``, metadata for these files
     will be taken from the original Tweets, not the Retweets.
+
+
+extractor.twitter.search-limit
+------------------------------
+Type
+    ``integer``
+Default
+    ``20``
+Description
+    Number of requested results per search query.
+
+
+extractor.twitter.search-pagination
+-----------------------------------
+Type
+    ``string``
+Default
+    ``"cursor"``
+Description
+    Selects how to paginate over search results.
+
+    ``"cursor"``
+        Use ``cursor`` values provided by the API
+    ``"max_id"`` | ``"maxid"`` | ``"id"``
+        Update the ``max_id`` search query parameter
+        to the Tweet ID value of the last retrieved Tweet.
+
+
+extractor.twitter.search-stop
+-----------------------------
+Type
+    ``integer``
+Default
+    * ``3`` if `search-pagination <extractor.twitter.search-pagination_>`__ is set to ``"cursor"``
+    * ``0`` otherwise
+Description
+    Number of empty search result batches
+    to accept before stopping.
 
 
 extractor.twitter.timeline.strategy
@@ -8029,20 +8314,21 @@ Default
     .. code:: json
 
         {
-            "coomerparty" : "coomer",
-            "kemonoparty" : "kemono",
-            "koharu"      : "schalenetwork",
-            "chzzk"       : "naver-chzzk",
-            "naver"       : "naver-blog",
-            "naverwebtoon": "naver-webtoon",
-            "pixiv"       : "pixiv-novel"
+            "coomerparty"  : "coomer",
+            "kemonoparty"  : "kemono",
+            "giantessbooru": "sizebooru",
+            "koharu"       : "schalenetwork",
+            "chzzk"        : "naver-chzzk",
+            "naver"        : "naver-blog",
+            "naverwebtoon" : "naver-webtoon",
+            "pixiv"        : "pixiv-novel"
         }
 Description
     Duplicate the configuration settings of extractor `categories`
     to other names.
 
     For example, a ``"naver": "naver-blog"`` key-value pair will make all
-    ``naver`` config settings available for ´´naver-blog´´ extractors as well.
+    ``naver`` config settings available for ``naver-blog`` extractors as well.
 
 
 jinja.environment
@@ -8594,9 +8880,11 @@ Example
     * ``"print Hello World"``
     * ``"raise AbortExtraction an error occured"``
     * ``"flag file = terminate"``
+    * ``["print Exiting", "exit 1"]``
 Description
     An Action_ is parsed as `Action Type`
-    followed by (optional) arguments.
+    followed by (optional) arguments:
+    ``<type> <arg1> <arg2> …``
 
     It is possible to specify more than one ``action``
     by providing them as a ``list``: ``["<action1>", "<action2>", …]``
@@ -8615,6 +8903,7 @@ Description
     ``level``:
         | Modify severity level of the current logging message.
         | Can be one of ``debug``, ``info``, ``warning``, ``error`` or an integer value.
+        | Use ``0`` to ignore a message (``level = 0``).
     ``print``:
         Write argument to stdout.
     ``exec``:
@@ -8683,6 +8972,7 @@ Description
 .. _download archive: `extractor.*.archive`_
 .. _Action(s): Action_
 
+.. _Conversion(s):      https://gdl-org.github.io/docs/formatting.html#conversions
 .. _.netrc:             https://stackoverflow.com/tags/.netrc/info
 .. _Last-Modified:      https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.29
 .. _datetime:           https://docs.python.org/3/library/datetime.html#datetime-objects
